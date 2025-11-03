@@ -1,0 +1,38 @@
+{
+ // Use IntelliSense to learn about possible attributes.
+ // Hover to view descriptions of existing attributes.
+ // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+ "version": "0.2.0",
+ "configurations": [
+    {
+      "name": "Run Vite Dev Server",
+      "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "BROWSER": "none",
+        "NODE_OPTIONS": "--inspect=9229"
+      },
+      "internalConsoleOptions": "neverOpen",
+      "description": "Starts the Vite dev server (npm run dev) in the integrated terminal and opens the Node inspector on port 9229."
+    },
+    {
+      "name": "Open in Chrome and Attach",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}",
+      "breakOnLoad": true,
+      "description": "Launches Chrome and attaches the debugger to the page at http://localhost:5173."
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Vite: Run + Debug in Browser",
+      "configurations": ["Run Vite Dev Server", "Open in Chrome and Attach"]
+    }
+  ]
+}
