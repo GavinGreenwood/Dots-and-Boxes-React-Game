@@ -14,9 +14,11 @@ interface GameState {
 export function GameBoard({
   width = 4,
   height = 4,
+  onGameEnd,
 }: {
   width?: number;
   height?: number;
+  onGameEnd?: (winner: 'player1' | 'player2' | 'tie') => void;
 }) {
   const [gameState, setGameState] = useState<GameState>(() => ({
     width,
@@ -80,10 +82,18 @@ export function GameBoard({
             next.currentPlayer === 'player1' ? 'player2' : 'player1';
         }
 
+        const totalBoxes = width * height;
+        const completedBoxes = next.scores.player1 + next.scores.player2;
+        if (completedBoxes === totalBoxes) {
+          const { player1, player2 } = next.scores;
+          const winner = player1 > player2 ? 'player1' : player2 > player1 ? 'player2' : 'tie';
+          onGameEnd?.(winner);
+        }
+
         return next;
       });
     },
-    []
+    [width, height, checkBoxComplete, onGameEnd]
   );
 
   const pad = 10,
