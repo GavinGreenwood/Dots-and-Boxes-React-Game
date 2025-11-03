@@ -47,8 +47,8 @@ export default function Game() {
 
           <GameBoard
             key={gameKey}
-            width={2}
-            height={2}
+            width={3}
+            height={3}
             onGameEnd={handleGameEnd}
           />
 
