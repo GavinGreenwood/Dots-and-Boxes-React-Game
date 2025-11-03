@@ -34,23 +34,47 @@ export function GameBoard({
     scores: { player1: 0, player2: 0 },
   }));
 
-  const handleLineClick = useCallback((type: "horizontal" | "vertical", row: number, col: number) => {
-  setGameState(prev => {
-    const next = { ...prev };
+  const checkBoxComplete = useCallback((s: GameState, r: number, c: number) => {
+    return (
+      s.horizontalLines[r][c] &&
+      s.horizontalLines[r + 1][c] &&
+      s.verticalLines[r][c] &&
+      s.verticalLines[r][c + 1]
+    );
+  }, []);
 
-    if (type === "horizontal") {
-      if (next.horizontalLines[row][col]) return prev; // already set
-      next.horizontalLines = next.horizontalLines.map(r => r.slice());
-      next.horizontalLines[row][col] = true;
-    } else {
-      if (next.verticalLines[row][col]) return prev;
-      next.verticalLines = next.verticalLines.map(r => r.slice());
-      next.verticalLines[row][col] = true;
-    }
+  const handleLineClick = useCallback(
+    (type: 'horizontal' | 'vertical', row: number, col: number) => {
+      setGameState((prev) => {
+        const next = { ...prev };
 
-    return next;
-  });
-}, []);
+        if (type === 'horizontal') {
+          if (next.horizontalLines[row][col]) return prev; // already set
+          next.horizontalLines = next.horizontalLines.map((r) => r.slice());
+          next.horizontalLines[row][col] = true;
+        } else {
+          if (next.verticalLines[row][col]) return prev;
+          next.verticalLines = next.verticalLines.map((r) => r.slice());
+          next.verticalLines[row][col] = true;
+        }
+
+        // after setting the line:
+        let completed = 0;
+        next.boxes = next.boxes.map((row) => row.slice());
+        for (let rr = 0; rr < next.height; rr++) {
+          for (let cc = 0; cc < next.width; cc++) {
+            if (!next.boxes[rr][cc] && checkBoxComplete(next, rr, cc)) {
+              next.boxes[rr][cc] = next.currentPlayer;
+              completed++;
+            }
+          }
+        }
+
+        return next;
+      });
+    },
+    []
+  );
 
   const pad = 10,
     cell = 60;
@@ -79,7 +103,7 @@ export function GameBoard({
             y1={10 + r * 60}
             x2={4 + (c + 1) * 60}
             y2={10 + r * 60}
-            stroke={_isSet ? "#333" : "transparent"}
+            stroke={_isSet ? '#333' : 'transparent'}
             strokeWidth={3}
             className="cursor-pointer hover:stroke-blue-500"
             onClick={() => handleLineClick('horizontal', r, c)}
@@ -96,10 +120,30 @@ export function GameBoard({
             y1={16 + r * 60}
             x2={10 + c * 60}
             y2={4 + (r + 1) * 60}
-            stroke={_isSet ? "#333" : "transparent"}
+            stroke={_isSet ? '#333' : 'transparent'}
             strokeWidth={3}
             className="cursor-pointer hover:stroke-blue-500"
             onClick={() => handleLineClick('vertical', r, c)}
+          />
+        ))
+      )}
+
+      {gameState.boxes.map((row, r) =>
+        row.map((owner, c) => (
+          <rect
+            key={`box-${r}-${c}`}
+            x={16 + c * 60}
+            y={16 + r * 60}
+            width={48}
+            height={48}
+            fill={
+              owner === 'player1'
+                ? '#ff6b6b'
+                : owner === 'player2'
+                  ? '#4ecdc4'
+                  : 'transparent'
+            }
+            fillOpacity={owner ? 0.7 : 0}
           />
         ))
       )}

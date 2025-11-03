@@ -9,7 +9,7 @@ export default function Game() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Dots & Boxes</h1>
-      <GameBoard width={3} height={3} />
+      <GameBoard width={4} height={4} />
     </div>
   );
 }
