@@ -70,6 +70,16 @@ export function GameBoard({
           }
         }
 
+        if (completed > 0) {
+          next.scores = {
+            ...next.scores,
+            [next.currentPlayer]: next.scores[next.currentPlayer] + completed,
+          };
+        } else {
+          next.currentPlayer =
+            next.currentPlayer === 'player1' ? 'player2' : 'player1';
+        }
+
         return next;
       });
     },
@@ -81,72 +91,93 @@ export function GameBoard({
   const svgW = width * cell + pad * 2;
   const svgH = height * cell + pad * 2;
   return (
-    <svg width={svgW} height={svgH} className="border border-gray-300">
-      {Array.from({ length: height + 1 }, (_, r) =>
-        Array.from({ length: width + 1 }, (_, c) => (
-          <circle
-            key={`dot-${r}-${c}`}
-            cx={pad + c * cell}
-            cy={pad + r * cell}
-            r={3}
-            fill="#333"
-          />
-        ))
-      )}
+    <div className="game-board">
+      <div className="game-info mb-4">
+        <div className="scores flex gap-4 mb-2">
+          <span
+            className={gameState.currentPlayer === 'player1' ? 'font-bold' : ''}
+          >
+            Player 1: {gameState.scores.player1}
+          </span>
+          <span
+            className={gameState.currentPlayer === 'player2' ? 'font-bold' : ''}
+          >
+            Player 2: {gameState.scores.player2}
+          </span>
+        </div>
+        <div className="current-turn">
+          Current Turn:{' '}
+          {gameState.currentPlayer === 'player1' ? 'Player 1' : 'Player 2'}
+        </div>
+      </div>
 
-      {/* horizontal lines */}
-      {gameState.horizontalLines.map((row, r) =>
-        row.map((_isSet, c) => (
-          <line
-            key={`h-${r}-${c}`}
-            x1={16 + c * 60}
-            y1={10 + r * 60}
-            x2={4 + (c + 1) * 60}
-            y2={10 + r * 60}
-            stroke={_isSet ? '#333' : 'transparent'}
-            strokeWidth={3}
-            className="cursor-pointer hover:stroke-blue-500"
-            onClick={() => handleLineClick('horizontal', r, c)}
-          />
-        ))
-      )}
+      <svg width={svgW} height={svgH} className="border border-gray-300">
+        {Array.from({ length: height + 1 }, (_, r) =>
+          Array.from({ length: width + 1 }, (_, c) => (
+            <circle
+              key={`dot-${r}-${c}`}
+              cx={pad + c * cell}
+              cy={pad + r * cell}
+              r={3}
+              fill="#333"
+            />
+          ))
+        )}
 
-      {/* vertical lines */}
-      {gameState.verticalLines.map((row, r) =>
-        row.map((_isSet, c) => (
-          <line
-            key={`v-${r}-${c}`}
-            x1={10 + c * 60}
-            y1={16 + r * 60}
-            x2={10 + c * 60}
-            y2={4 + (r + 1) * 60}
-            stroke={_isSet ? '#333' : 'transparent'}
-            strokeWidth={3}
-            className="cursor-pointer hover:stroke-blue-500"
-            onClick={() => handleLineClick('vertical', r, c)}
-          />
-        ))
-      )}
+        {/* horizontal lines */}
+        {gameState.horizontalLines.map((row, r) =>
+          row.map((_isSet, c) => (
+            <line
+              key={`h-${r}-${c}`}
+              x1={16 + c * 60}
+              y1={10 + r * 60}
+              x2={4 + (c + 1) * 60}
+              y2={10 + r * 60}
+              stroke={_isSet ? '#333' : 'transparent'}
+              strokeWidth={3}
+              className="cursor-pointer hover:stroke-blue-500"
+              onClick={() => handleLineClick('horizontal', r, c)}
+            />
+          ))
+        )}
 
-      {gameState.boxes.map((row, r) =>
-        row.map((owner, c) => (
-          <rect
-            key={`box-${r}-${c}`}
-            x={16 + c * 60}
-            y={16 + r * 60}
-            width={48}
-            height={48}
-            fill={
-              owner === 'player1'
-                ? '#ff6b6b'
-                : owner === 'player2'
-                  ? '#4ecdc4'
-                  : 'transparent'
-            }
-            fillOpacity={owner ? 0.7 : 0}
-          />
-        ))
-      )}
-    </svg>
+        {/* vertical lines */}
+        {gameState.verticalLines.map((row, r) =>
+          row.map((_isSet, c) => (
+            <line
+              key={`v-${r}-${c}`}
+              x1={10 + c * 60}
+              y1={16 + r * 60}
+              x2={10 + c * 60}
+              y2={4 + (r + 1) * 60}
+              stroke={_isSet ? '#333' : 'transparent'}
+              strokeWidth={3}
+              className="cursor-pointer hover:stroke-blue-500"
+              onClick={() => handleLineClick('vertical', r, c)}
+            />
+          ))
+        )}
+
+        {gameState.boxes.map((row, r) =>
+          row.map((owner, c) => (
+            <rect
+              key={`box-${r}-${c}`}
+              x={16 + c * 60}
+              y={16 + r * 60}
+              width={48}
+              height={48}
+              fill={
+                owner === 'player1'
+                  ? '#ff6b6b'
+                  : owner === 'player2'
+                    ? '#4ecdc4'
+                    : 'transparent'
+              }
+              fillOpacity={owner ? 0.7 : 0}
+            />
+          ))
+        )}
+      </svg>
+    </div>
   );
 }
