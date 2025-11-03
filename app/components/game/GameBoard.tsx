@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 type Player = 'player1' | 'player2';
 interface GameState {
@@ -18,7 +18,7 @@ export function GameBoard({
   width?: number;
   height?: number;
 }) {
-  const [gameState] = useState<GameState>(() => ({
+  const [gameState, setGameState] = useState<GameState>(() => ({
     width,
     height,
     horizontalLines: Array.from({ length: height + 1 }, () =>
@@ -34,14 +34,23 @@ export function GameBoard({
     scores: { player1: 0, player2: 0 },
   }));
 
-  const handleLineClick = (
-    type: 'horizontal' | 'vertical',
-    r: number,
-    c: number
-  ) => {
-    // step 3: just console.log for now
-    console.log('click', type, r, c);
-  };
+  const handleLineClick = useCallback((type: "horizontal" | "vertical", row: number, col: number) => {
+  setGameState(prev => {
+    const next = { ...prev };
+
+    if (type === "horizontal") {
+      if (next.horizontalLines[row][col]) return prev; // already set
+      next.horizontalLines = next.horizontalLines.map(r => r.slice());
+      next.horizontalLines[row][col] = true;
+    } else {
+      if (next.verticalLines[row][col]) return prev;
+      next.verticalLines = next.verticalLines.map(r => r.slice());
+      next.verticalLines[row][col] = true;
+    }
+
+    return next;
+  });
+}, []);
 
   const pad = 10,
     cell = 60;
@@ -70,7 +79,7 @@ export function GameBoard({
             y1={10 + r * 60}
             x2={4 + (c + 1) * 60}
             y2={10 + r * 60}
-            stroke="transparent"
+            stroke={_isSet ? "#333" : "transparent"}
             strokeWidth={3}
             className="cursor-pointer hover:stroke-blue-500"
             onClick={() => handleLineClick('horizontal', r, c)}
@@ -87,7 +96,7 @@ export function GameBoard({
             y1={16 + r * 60}
             x2={10 + c * 60}
             y2={4 + (r + 1) * 60}
-            stroke="transparent"
+            stroke={_isSet ? "#333" : "transparent"}
             strokeWidth={3}
             className="cursor-pointer hover:stroke-blue-500"
             onClick={() => handleLineClick('vertical', r, c)}
